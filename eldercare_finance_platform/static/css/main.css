@@ -1,0 +1,317 @@
+/* 添加新的聊天界面样式 */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* 自定义样式 */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.section {
+  min-height: 100vh;
+  transition: background-color 0.5s ease;
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.slide-up {
+  animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+  0% { 
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.btn-primary {
+  @apply bg-primary text-white font-medium py-2 px-6 rounded-md hover:bg-primary-dark transition duration-300;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-white font-medium py-2 px-6 rounded-md hover:bg-secondary-dark transition duration-300;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 border border-neutral-dark rounded-md focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-md p-6;
+}
+
+/* 老年人友好的大字体 */
+.text-elder {
+  @apply text-lg;
+}
+
+.text-elder-title {
+  @apply text-2xl font-bold;
+}
+
+/* 导航栏样式 */
+.nav-link {
+  @apply px-4 py-2 text-gray-700 hover:text-primary transition duration-300;
+}
+
+.nav-link.active {
+  @apply text-primary font-medium;
+}
+
+/* 功能卡片 */
+.feature-card {
+  @apply bg-white rounded-lg shadow-md p-6 transition duration-300 hover:shadow-lg;
+}
+
+/* 老年人友好的高对比度按钮 */
+.btn-contrast {
+  @apply bg-blue-800 text-white font-bold py-3 px-6 rounded-md text-lg hover:bg-blue-900 transition duration-300;
+}
+
+/* 新的聊天界面样式 */
+.chat-layout {
+  @apply flex h-[calc(100vh-4rem)];
+}
+
+.chat-sidebar {
+  @apply w-64 bg-gray-50 border-r border-gray-200 h-full overflow-y-auto hidden md:block transition-all duration-300 ease-in-out;
+}
+
+.chat-sidebar.open {
+  @apply block;
+}
+
+.chat-main {
+  @apply flex-1 flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out;
+}
+
+.chat-history-item {
+  @apply p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 transition duration-200;
+}
+
+.chat-history-item.active {
+  @apply bg-gray-200;
+}
+
+.chat-container {
+  @apply flex-1 overflow-y-auto p-4 bg-neutral-lightest;
+}
+
+.chat-message {
+  @apply mb-4 p-4 rounded-lg max-w-[85%] relative;
+}
+
+.user-message {
+  @apply bg-primary-light text-white ml-auto;
+}
+
+.ai-message {
+  @apply bg-neutral-light text-gray-800;
+}
+
+.message-actions {
+  @apply absolute right-2 top-2 opacity-0 transition-opacity duration-200 flex space-x-1;
+}
+
+.chat-message:hover .message-actions {
+  @apply opacity-100;
+}
+
+.action-button {
+  @apply p-1 text-gray-500 hover:text-gray-700 rounded;
+}
+
+.chat-input-container {
+  @apply p-4 border-t border-gray-200 bg-white;
+}
+
+.chat-form {
+  @apply relative;
+}
+
+.chat-input {
+  @apply w-full p-3 pr-24 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none;
+}
+
+.chat-submit {
+  @apply absolute right-2 bottom-2;
+}
+
+.file-upload-button {
+  @apply absolute left-2 bottom-2 p-2 text-gray-500 hover:text-gray-700 rounded;
+}
+
+/* 初始搜索框样式 */
+.search-container {
+  @apply flex flex-col items-center justify-center h-[calc(100vh-8rem)] transition-all duration-500 ease-in-out;
+}
+
+.search-box {
+  @apply w-full max-w-2xl mx-auto shadow-lg rounded-lg overflow-hidden transition-all duration-300 ease-in-out;
+}
+
+.search-input {
+  @apply w-full p-4 text-xl border-0 focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
+/* 动画效果 */
+.animate-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Markdown 样式 */
+.markdown-content h1 {
+  @apply text-2xl font-bold mb-4 mt-6;
+}
+
+.markdown-content h2 {
+  @apply text-xl font-bold mb-3 mt-5;
+}
+
+.markdown-content h3 {
+  @apply text-lg font-bold mb-2 mt-4;
+}
+
+.markdown-content p {
+  @apply mb-4;
+}
+
+.markdown-content ul, .markdown-content ol {
+  @apply mb-4 ml-6;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content a {
+  @apply text-blue-600 hover:underline;
+}
+
+.markdown-content blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic my-4;
+}
+
+.markdown-content pre {
+  @apply bg-gray-100 p-4 rounded-md overflow-x-auto my-4;
+}
+
+.markdown-content code {
+  @apply font-mono text-sm bg-gray-100 px-1 py-0.5 rounded;
+}
+
+.markdown-content pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse my-4;
+}
+
+.markdown-content th, .markdown-content td {
+  @apply border border-gray-300 p-2;
+}
+
+.markdown-content th {
+  @apply bg-gray-100;
+}
+
+/* 停止生成按钮 */
+.stop-generating {
+  @apply bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition duration-300 text-sm;
+}
+
+/* 重新生成按钮 */
+.regenerate {
+  @apply bg-green-100 text-green-700 px-4 py-2 rounded-md hover:bg-green-200 transition duration-300 text-sm;
+}
+
+/* 编辑消息按钮 */
+.edit-message {
+  @apply bg-blue-100 text-blue-700 px-4 py-2 rounded-md hover:bg-blue-200 transition duration-300 text-sm;
+}
+
+/* 加载动画 */
+.typing-indicator {
+  @apply flex space-x-1 items-center;
+}
+
+.typing-indicator span {
+  @apply w-2 h-2 bg-gray-400 rounded-full;
+  animation: typingAnimation 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingAnimation {
+  0%, 80%, 100% { 
+    transform: scale(0.6);
+  }
+  40% { 
+    transform: scale(1);
+  }
+}
+
+/* 文件上传样式 */
+.file-upload-container {
+  @apply mt-2 p-2 border border-dashed border-gray-300 rounded-md;
+}
+
+.file-preview {
+  @apply flex items-center p-2 bg-gray-50 rounded-md mt-1;
+}
+
+.file-name {
+  @apply ml-2 text-sm text-gray-700 flex-grow truncate;
+}
+
+.remove-file {
+  @apply text-red-500 hover:text-red-700;
+}
+
+/* 平滑过渡效果 */
+.transition-height {
+  transition: height 0.3s ease-in-out;
+}
+
+.transition-opacity {
+  transition: opacity 0.3s ease-in-out;
+}

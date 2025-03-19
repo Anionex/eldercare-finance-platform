@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 长者金融</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-lightest">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <a href="{{ url_for('main.index') }}" class="text-3xl font-bold text-primary">长者金融</a>
+                <h2 class="mt-6 text-elder-title text-gray-800">登录您的账户</h2>
+                <p class="mt-2 text-elder text-gray-600">欢迎回来，请使用手机号登录</p>
+            </div>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form class="mt-8 space-y-6" action="{{ url_for('auth.login') }}" method="POST">
+                <div class="rounded-md shadow-sm space-y-4">
+                    <div>
+                        <label for="phone" class="text-elder text-gray-700 block mb-2">手机号码</label>
+                        <input id="phone" name="phone" type="tel" required class="input-field text-elder" placeholder="请输入11位手机号码">
+                    </div>
+                    <div>
+                        <label for="verification_code" class="text-elder text-gray-700 block mb-2">验证码</label>
+                        <div class="flex">
+                            <input id="verification_code" name="verification_code" type="text" required class="input-field text-elder" placeholder="请输入验证码">
+                            <button type="button" id="send-code" class="ml-2 px-4 py-3 bg-secondary text-white rounded-md hover:bg-secondary-dark transition duration-300">获取验证码</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn-contrast w-full text-center">
+                        登录
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-elder text-gray-600">
+                    首次使用? 系统将自动为您创建账户
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 发送验证码按钮逻辑
+        document.getElementById('send-code').addEventListener('click', function() {
+            const phoneInput = document.getElementById('phone');
+            const phone = phoneInput.value.trim();
+            
+            // 简单的手机号验证
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('请输入正确的手机号码');
+                return;
+            }
+            
+            // 发送验证码请求
+            fetch('{{ url_for("auth.send_verification_code") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `phone=${phone}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 倒计时60秒
+                    let countdown = 60;
+                    const button = document.getElementById('send-code');
+                    button.disabled = true;
+                    
+                    const timer = setInterval(() => {
+                        button.textContent = `${countdown}秒后重试`;
+                        countdown--;
+                        
+                        if (countdown < 0) {
+                            clearInterval(timer);
+                            button.disabled = false;
+                            button.textContent = '获取验证码';
+                        }
+                    }, 1000);
+                    
+                    alert('验证码已发送，请注意查收');
+                } else {
+                    alert(data.message || '发送验证码失败，请稍后重试');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发送验证码失败，请稍后重试');
+            });
+        });
+    </script>
+</body>
+</html>

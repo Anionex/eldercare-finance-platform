@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>长者金融 - 专业养老金融服务平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 监听滚动事件，实现动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            const animatedElements = document.querySelectorAll('.animate-scroll');
+            
+            // 初始背景颜色
+            let currentSection = 0;
+            const sectionColors = [
+                'bg-blue-50',
+                'bg-neutral-lightest',
+                'bg-blue-50',
+                'bg-neutral-light'
+            ];
+            
+            // 滚动监听函数
+            function checkScroll() {
+                // 检测当前在哪个部分
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+                
+                sections.forEach((section, index) => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    
+                    if (scrollPosition >= sectionTop - windowHeight / 2 && 
+                        scrollPosition < sectionTop + sectionHeight - windowHeight / 2) {
+                        if (currentSection !== index) {
+                            currentSection = index;
+                            document.body.className = sectionColors[index];
+                        }
+                    }
+                });
+                
+                // 检测需要动画的元素
+                animatedElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    
+                    if (elementTop < windowHeight * 0.8) {
+                        element.classList.add('visible');
+                    }
+                });
+            }
+            
+            // 初始检查
+            checkScroll();
+            
+            // 添加滚动监听
+            window.addEventListener('scroll', checkScroll);
+        });
+    </script>
+</head>
+<body class="bg-blue-50 transition-colors duration-500">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 w-full bg-white shadow-md z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="{{ url_for('main.index') }}" class="text-2xl font-bold text-primary">长者金融</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#services" class="nav-link">服务内容</a>
+                <a href="#features" class="nav-link">平台特色</a>
+                <a href="#about" class="nav-link">关于我们</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}" class="btn-primary">进入系统</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-primary">立即登录</a>
+                {% endif %}
+            </div>
+            <div class="md:hidden">
+                <button id="menu-toggle" class="focus:outline-none">
+                    <svg class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white px-6 py-4 shadow-md">
+            <a href="#services" class="block py-2 text-gray-700">服务内容</a>
+            <a href="#features" class="block py-2 text-gray-700">平台特色</a>
+            <a href="#about" class="block py-2 text-gray-700">关于我们</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.dashboard') }}" class="block py-2 text-primary font-medium">进入系统</a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" class="block py-2 text-primary font-medium">立即登录</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- 主页内容 -->
+    <!-- 第一部分：欢迎页 -->
+    <section id="welcome" class="section flex items-center justify-center pt-20">
+        <div class="container mx-auto px-6 py-20 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-800 slide-up">专业养老金融服务平台</h1>
+            <p class="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto slide-up">为您的晚年生活提供专业的金融咨询、财务规划和投资管理服务</p>
+            <div class="flex flex-col md:flex-row justify-center gap-4 slide-up">
+                <a href="{{ url_for('auth.login') }}" class="btn-contrast">开始咨询</a>
+                <a href="#services" class="btn-secondary">了解更多</a>
+            </div>
+            <div class="mt-16 animate-scroll">
+                <img src="{{ url_for('static', filename='images/elder-finance.jpg') }}" alt="养老金融服务" class="max-w-3xl mx-auto rounded-lg shadow-xl">
+            </div>
+        </div>
+    </section>
+
+    <!-- 第二部分：服务内容 -->
+    <section id="services" class="section bg-neutral-lightest py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-16 text-gray-800 animate-scroll">我们的服务</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card animate-scroll">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">金融咨询</h3>
+                    <p class="text-elder text-gray-600">提供专业的养老金融产品推荐、常识科普和个性化建议，帮助您做出明智的财务决策。</p>
+                </div>
+                <div class="feature-card animate-scroll">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">财务分析</h3>
+                    <p class="text-elder text-gray-600">通过专业的财务评估、趋势分析和风险分析，帮助您了解自己的财务状况和未来规划。</p>
+                </div>
+                <div class="feature-card animate-scroll">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">投资管理</h3>
+                    <p class="text-elder text-gray-600">提供风险管理、投资组合调整和方案制定服务，确保您的资产得到合理配置和增值。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第三部分：平台特色 -->
+    <section id="features" class="section bg-blue-50 py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-16 text-gray-800 animate-scroll">平台特色</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="animate-scroll">
+                    <img src="{{ url_for('static', filename='images/ai-advisor.jpg') }}" alt="AI顾问" class="rounded-lg shadow-xl">
+                </div>
+                <div class="flex flex-col justify-center animate-scroll">
+                    <h3 class="text-elder-title mb-6">智能AI顾问</h3>
+                    <p class="text-elder text-gray-600 mb-6">我们的平台采用先进的人工智能技术，为您提供24小时不间断的金融咨询服务。无论何时何地，您都可以获得专业的建议和解答。</p>
+                    <ul class="text-elder text-gray-600 space-y-3">
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>个性化金融建议</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>简单易懂的解释</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>实时市场分析</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-20">
+                <div class="flex flex-col justify-center order-2 md:order-1 animate-scroll">
+                    <h3 class="text-elder-title mb-6">专业安全保障</h3>
+                    <p class="text-elder text-gray-600 mb-6">我们的平台由金融专家团队支持，确保所有建议和分析都基于专业知识和市场洞察。同时，我们采用严格的安全措施保护您的个人信息和财务数据。</p>
+                    <ul class="text-elder text-gray-600 space-y-3">
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>专业金融团队支持</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>数据加密保护</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>隐私保护承诺</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="order-1 md:order-2 animate-scroll">
+                    <img src="{{ url_for('static', filename='images/security.jpg') }}" alt="安全保障" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第四部分：关于我们 -->
+    <section id="about" class="section bg-neutral-light py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-16 text-gray-800 animate-scroll">关于我们</h2>
+            <div class="max-w-3xl mx-auto text-center animate-scroll">
+                <p class="text-elder text-gray-600 mb-8">长者金融是一家专注于为老年人提供金融服务的平台，我们的使命是通过专业的金融咨询、财务分析和投资管理服务，帮助老年人实现财务安全和晚年幸福。</p>
+                <p class="text-elder text-gray-600 mb-8">我们的团队由金融专家、数据分析师和人工智能工程师组成，致力于为老年人提供简单易懂、安全可靠的金融服务。</p>
+                <div class="mt-10">
+                    <a href="{{ url_for('auth.login') }}" class="btn-contrast">立即体验</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-10">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-xl font-bold mb-4">长者金融</h3>
+                    <p class="text-gray-400">专业养老金融服务平台</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">服务</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">金融咨询</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">财务分析</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">投资管理</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">关于</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">公司简介</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">团队介绍</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">联系我们</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">法律</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">隐私政策</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">服务条款</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 长者金融. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI聊天 - 长者金融</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 添加Markdown和LaTeX支持 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/sql.min.js"></script>
+</head>
+<body class="bg-neutral-lightest">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="text-2xl font-bold text-primary">长者金融</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{{ url_for('main.dashboard') }}" class="nav-link">首页</a>
+                    <a href="{{ url_for('chat.chat_interface') }}" class="nav-link active">AI咨询</a>
+                    <a href="{{ url_for('main.virtual_assistant') }}" class="nav-link">虚拟人对话</a>
+                    <a href="{{ url_for('main.consultation') }}" class="nav-link">咨询服务</a>
+                    <a href="{{ url_for('main.financial_analysis') }}" class="nav-link">财务分析</a>
+                    <a href="{{ url_for('main.portfolio_management') }}" class="nav-link">投资管理</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn-secondary">退出登录</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <svg class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white px-6 py-4 shadow-md">
+            <a href="{{ url_for('main.dashboard') }}" class="block py-2 text-gray-700">首页</a>
+            <a href="{{ url_for('chat.chat_interface') }}" class="block py-2 text-primary font-medium">AI咨询</a>
+            <a href="{{ url_for('main.virtual_assistant') }}" class="block py-2 text-gray-700">虚拟人对话</a>
+            <a href="{{ url_for('main.consultation') }}" class="block py-2 text-gray-700">咨询服务</a>
+            <a href="{{ url_for('main.financial_analysis') }}" class="block py-2 text-gray-700">财务分析</a>
+            <a href="{{ url_for('main.portfolio_management') }}" class="block py-2 text-gray-700">投资管理</a>
+            <a href="{{ url_for('auth.logout') }}" class="block py-2 text-gray-700">退出登录</a>
+        </div>
+    </nav>
+
+    <!-- 初始搜索框 -->
+    <div id="search-container" class="search-container">
+        <div class="search-box">
+            <form id="initial-form" class="flex items-center">
+                <input type="text" id="initial-input" class="search-input text-elder" placeholder="请输入您的问题..." required>
+                <button type="submit" class="btn-primary">
+                    发送
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 聊天界面 -->
+    <div id="chat-interface" class="hidden">
+        <div class="chat-layout">
+            <!-- 左侧历史对话抽屉 -->
+            <div id="chat-sidebar" class="chat-sidebar">
+                <div class="p-4 border-b border-gray-200">
+                    <button id="new-chat-btn" class="btn-primary w-full flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        新对话
+                    </button>
+                </div>
+                <div id="chat-history-list" class="overflow-y-auto">
+                    <!-- 历史对话将在这里动态添加 -->
+                </div>
+            </div>
+
+            <!-- 主聊天区域 -->
+            <div class="chat-main">
+                <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                    <div class="flex items-center">
+                        <button id="toggle-sidebar" class="md:hidden mr-4 focus:outline-none">
+                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <h1 class="text-elder-title text-gray-800">AI金融顾问</h1>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="clear-chat" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-300 text-sm">清除对话</button>
+                    </div>
+                </div>
+
+                <!-- 聊天消息区域 -->
+                <div id="chat-container" class="chat-container">
+                    <div id="chat-messages">
+                        <!-- 欢迎消息 -->
+                        <div class="chat-message ai-message">
+                            <div class="markdown-content">
+                                <p>您好，我是您的AI金融顾问。我可以为您提供养老金融咨询、理财建议和风险管理方案。请问有什么可以帮助您的吗？</p>
+                            </div>
+                        </div>
+                        <!-- 聊天消息将在这里动态添加 -->
+                    </div>
+                </div>
+
+                <!-- 输入区域 -->
+                <div class="chat-input-container">
+                    <form id="chat-form" class="chat-form">
+                        <textarea id="user-input" class="chat-input text-elder" placeholder="请输入您的问题..." rows="1" required></textarea>
+                        <button type="button" id="file-upload-btn" class="file-upload-button">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                            </svg>
+                        </button>
+                        <input type="file" id="file-upload" class="hidden" accept=".txt,.md,.csv,.json">
+                        <div id="file-preview-container" class="hidden file-upload-container">
+                            <div id="file-preview" class="file-preview">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span id="file-name" class="file-name"></span>
+                                <button type="button" id="remove-file" class="remove-file">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary chat-submit">
+                            发送
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 配置Marked选项
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true
+        });
+
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 聊天功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialForm = document.getElementById('initial-form');
+            const initialInput = document.getElementById('initial-input');
+            const searchContainer = document.getElementById('search-container');
+            const chatInterface = document.getElementById('chat-interface');
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatContainer = document.getElementById('chat-container');
+            const clearChatButton = document.getElementById('clear-chat');
+            const newChatButton = document.getElementById('new-chat-btn');
+            const toggleSidebarButton = document.getElementById('toggle-sidebar');
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const chatHistoryList = document.getElementById('chat-history-list');
+            const fileUploadBtn = document.getElementById('file-upload-btn');
+            const fileUpload = document.getElementById('file-upload');
+            const filePreviewContainer = document.getElementById('file-preview-container');
+            const fileName = document.getElementById('file-name');
+            const removeFileBtn = document.getElementById('remove-file');
+            
+            let isGenerating = false;
+            let currentMessageElement = null;
+            let selectedFile = null;
+            
+            // 自动调整文本区域高度
+            userInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // 初始搜索框提交
+            initialForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const message = initialInput.value.trim();
+                if (!message) return;
+                
+                // 隐藏搜索框，显示聊天界面
+                searchContainer.classList.add('hidden');
+                chatInterface.classList.remove('hidden');
+                
+                // 发送消息
+                sendMessage(message);
+            });
+            
+            // 聊天表单提交
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const message = userInput.value.trim();
+                if (!message && !selectedFile) return;
+                
+                // 发送消息
+                sendMessage(message);
+            });
+            
+            // 发送消息函数
+            function sendMessage(message) {
+                if (isGenerating) return;
+                
+                // 添加用户消息到聊天界面
+                addMessage(message, 'user');
+                
+                // 清空输入框并重置高度
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                
+                // 准备请求数据
+                let requestData = { message: message };
+                
+                // 如果有选择的文件，添加到请求中
+                if (selectedFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        requestData.file_content = e.target.result;
+                        requestData.file_name = selectedFile.name;
+                        
+                        // 清除文件选择
+                        clearFileSelection();
+                        
+                        // 发送请求
+                        sendRequest(requestData);
+                    };
+                    reader.readAsText(selectedFile);
+                } else {
+                    // 直接发送请求
+                    sendRequest(requestData);
+                }
+            }
+            
+            // 发送请求到服务器
+            function sendRequest(requestData) {
+                // 显示加载状态
+                isGenerating = true;
+                const loadingMessage = document.createElement('div');
+                loadingMessage.className = 'chat-message ai-message';
+                loadingMessage.innerHTML = `
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                chatMessages.appendChild(loadingMessage);
+                
+                // 滚动到底部
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // 发送消息到服务器
+                fetch('{{ url_for("chat.send_message") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // 移除加载消息
+                    chatMessages.removeChild(loadingMessage);
+                    isGenerating = false;
+                    
+                    if (data.success) {
+                        // 添加AI回复到聊天界面
+                        addMessage(data.message, 'ai');
+                        
+                        // 更新历史对话列表
+                        fetchChatHistory();
+                    } else {
+                        // 显示错误消息
+                        addMessage('抱歉，发生了错误，请稍后再试。', 'ai');
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    // 移除加载消息
+                    chatMessages.removeChild(loadingMessage);
+                    isGenerating = false;
+                    
+                    // 显示错误消息
+                    addMessage('抱歉，发生了错误，请稍后再试。', 'ai');
+                    console.error('Error:', error);
+                });
+            }
+            
+            // 停止生成
+            function stopGenerating() {
+                if (!isGenerating) return;
+                
+                fetch('{{ url_for("chat.stop_generating") }}', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        isGenerating = false;
+                        // 可以添加一些视觉反馈
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            
+            // 重新生成回复
+            function regenerateResponse() {
+                if (isGenerating) return;
+                
+                // 获取最后一条用户消息
+                const userMessages = document.querySelectorAll('.user-message');
+                if (userMessages.length === 0) return;
+                
+                const lastUserMessage = userMessages[userMessages.length - 1];
+                const messageText = lastUserMessage.querySelector('p').textContent;
+                
+                // 移除最后一条AI消息
+                const aiMessages = document.querySelectorAll('.ai-message');
+                if (aiMessages.length > 1) { // 保留欢迎消息
+                    chatMessages.removeChild(aiMessages[aiMessages.length - 1]);
+                }
+                
+                // 重新发送请求
+                sendRequest({ message: messageText });
+            }
+            
+            // 编辑消息
+            function editMessage(messageElement) {
+                const messageText = messageElement.querySelector('p').textContent;
+                userInput.value = messageText;
+                userInput.focus();
+                
+                // 如果是用户消息，可以删除它，因为用户将重新发送
+                if (messageElement.classList.contains('user-message')) {
+                    // 删除这条消息和它之后的AI回复
+                    const nextElement = messageElement.nextElementSibling;
+                    if (nextElement && nextElement.classList.contains('ai-message')) {
+                        chatMessages.removeChild(nextElement);
+                    }
+                    chatMessages.removeChild(messageElement);
+                }
+            }
+            
+            // 添加消息到聊天界面
+            function addMessage(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.className = `chat-message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+                
+                // 添加消息操作按钮
+                if (sender === 'user') {
+                    messageElement.innerHTML = `
+                        <div class="message-actions">
+                            <button class="action-button edit-btn" title="编辑消息">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p>${message}</p>
+                    `;
+                    
+                    // 添加编辑按钮事件
+                    messageElement.querySelector('.edit-btn').addEventListener('click', function() {
+                        editMessage(messageElement);
+                    });
+                } else {
+                    // AI消息，添加重新生成按钮
+                    messageElement.innerHTML = `
+                        <div class="message-actions">
+                            <button class="action-button regenerate-btn" title="重新生成">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="markdown-content"></div>
+                    `;
+                    
+                    // 渲染Markdown内容
+                    const markdownContent = messageElement.querySelector('.markdown-content');
+                    markdownContent.innerHTML = marked.parse(message);
+                    
+                    // 渲染LaTeX公式
+                    renderMathInElement(markdownContent, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError: false
+                    });
+                    
+                    // 添加重新生成按钮事件
+                    messageElement.querySelector('.regenerate-btn').addEventListener('click', function() {
+                        regenerateResponse();
+                    });
+                }
+                
+                chatMessages.appendChild(messageElement);
+                currentMessageElement = messageElement;
+                
+                // 滚动到底部
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // 清除聊天
+            clearChatButton.addEventListener('click', function() {
+                // 确认是否清除
+                if (confirm('确定要清除当前对话吗？')) {
+                    // 发送清除请求
+                    fetch('{{ url_for("chat.clear_history") }}', {
+                        method: 'POST',
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 清除聊天界面，只保留欢迎消息
+                            chatMessages.innerHTML = `
+                                <div class="chat-message ai-message">
+                                    <div class="markdown-content">
+                                        <p>您好，我是您的AI金融顾问。我可以为您提供养老金融咨询、理财建议和风险管理方案。请问有什么可以帮助您的吗？</p>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // 更新历史对话列表
+                            fetchChatHistory();
+                        } else {
+                            alert('清除对话失败，请稍后重试');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('清除对话失败，请稍后重试');
+                    });
+                }
+            });
+            
+            // 新对话按钮
+            newChatButton.addEventListener('click', function() {
+                window.location.href = '{{ url_for("chat.new_chat") }}';
+            });
+            
+            // 切换侧边栏
+            toggleSidebarButton.addEventListener('click', function() {
+                chatSidebar.classList.toggle('open');
+            });
+            
+            // 获取聊天历史
+            function fetchChatHistory() {
+                fetch('{{ url_for("chat.get_history") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 清空历史列表
+                        chatHistoryList.innerHTML = '';
+                        
+                        // 添加历史对话
+                        data.history.forEach(item => {
+                            const historyItem = document.createElement('div');
+                            historyItem.className = 'chat-history-item';
+                            historyItem.innerHTML = `
+                                <div class="text-sm font-medium truncate">${item.user_message}</div>
+                                <div class="text-xs text-gray-500">${item.timestamp}</div>
+                            `;
+                            
+                            // 点击加载历史对话
+                            historyItem.addEventListener('click', function() {
+                                // 这里可以实现加载历史对话的功能
+                                // 需要后端支持
+                            });
+                            
+                            chatHistoryList.appendChild(historyItem);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            
+            // 文件上传按钮点击
+            fileUploadBtn.addEventListener('click', function() {
+                fileUpload.click();
+            });
+            
+            // 文件选择变化
+            fileUpload.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    selectedFile = this.files[0];
+                    
+                    // 检查文件类型
+                    const validTypes = ['.txt', '.md', '.csv', '.json'];
+                    const fileExt = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
+                    
+                    if (!validTypes.includes(fileExt)) {
+                        alert('暂时只接受文本类型的文件（.txt, .md, .csv, .json）');
+                        clearFileSelection();
+                        return;
+                    }
+                    
+                    // 显示文件预览
+                    fileName.textContent = selectedFile.name;
+                    filePreviewContainer.classList.remove('hidden');
+                }
+            });
+            
+            // 移除文件按钮
+            removeFileBtn.addEventListener('click', function() {
+                clearFileSelection();
+            });
+            
+            // 清除文件选择
+            function clearFileSelection() {
+                selectedFile = null;
+                fileUpload.value = '';
+                filePreviewContainer.classList.add('hidden');
+            }
+            
+            // 初始加载历史对话
+            fetchChatHistory();
+            
+            // 检测是否有初始消息参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialMessage = urlParams.get('message');
+            if (initialMessage) {
+                // 直接显示聊天界面并发送初始消息
+                searchContainer.classList.add('hidden');
+                chatInterface.classList.remove('hidden');
+                sendMessage(initialMessage);
+            }
+        });
+    </script>
+</body>
+</html>

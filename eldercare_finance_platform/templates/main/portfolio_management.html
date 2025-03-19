@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投资管理 - 长者金融</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-lightest">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="text-2xl font-bold text-primary">长者金融</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{{ url_for('main.dashboard') }}" class="nav-link">首页</a>
+                    <a href="{{ url_for('chat.chat_interface') }}" class="nav-link">AI咨询</a>
+                    <a href="{{ url_for('main.virtual_assistant') }}" class="nav-link">虚拟人对话</a>
+                    <a href="{{ url_for('main.consultation') }}" class="nav-link">咨询服务</a>
+                    <a href="{{ url_for('main.financial_analysis') }}" class="nav-link">财务分析</a>
+                    <a href="{{ url_for('main.portfolio_management') }}" class="nav-link active">投资管理</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn-secondary">退出登录</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <svg class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white px-6 py-4 shadow-md">
+            <a href="{{ url_for('main.dashboard') }}" class="block py-2 text-gray-700">首页</a>
+            <a href="{{ url_for('chat.chat_interface') }}" class="block py-2 text-gray-700">AI咨询</a>
+            <a href="{{ url_for('main.virtual_assistant') }}" class="block py-2 text-gray-700">虚拟人对话</a>
+            <a href="{{ url_for('main.consultation') }}" class="block py-2 text-gray-700">咨询服务</a>
+            <a href="{{ url_for('main.financial_analysis') }}" class="block py-2 text-gray-700">财务分析</a>
+            <a href="{{ url_for('main.portfolio_management') }}" class="block py-2 text-primary font-medium">投资管理</a>
+            <a href="{{ url_for('auth.logout') }}" class="block py-2 text-gray-700">退出登录</a>
+        </div>
+    </nav>
+
+    <!-- 功能开发中内容 -->
+    <div class="container mx-auto px-4 py-20">
+        <div class="max-w-3xl mx-auto text-center">
+            <div class="text-primary text-6xl mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-32 w-32 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ message }}</h1>
+            <p class="text-xl text-gray-600 mb-10">我们正在努力开发这项功能，敬请期待！</p>
+            <a href="{{ url_for('main.dashboard') }}" class="btn-contrast">返回首页</a>
+        </div>
+    </div>
+
+    <script>
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制面板 - 长者金融</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-lightest">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="text-2xl font-bold text-primary">长者金融</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{{ url_for('main.dashboard') }}" class="nav-link active">首页</a>
+                    <a href="{{ url_for('chat.chat_interface') }}" class="nav-link">AI咨询</a>
+                    <a href="{{ url_for('main.virtual_assistant') }}" class="nav-link">虚拟人对话</a>
+                    <a href="{{ url_for('main.consultation') }}" class="nav-link">咨询服务</a>
+                    <a href="{{ url_for('main.financial_analysis') }}" class="nav-link">财务分析</a>
+                    <a href="{{ url_for('main.portfolio_management') }}" class="nav-link">投资管理</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn-secondary">退出登录</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <svg class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white px-6 py-4 shadow-md">
+            <a href="{{ url_for('main.dashboard') }}" class="block py-2 text-primary font-medium">首页</a>
+            <a href="{{ url_for('chat.chat_interface') }}" class="block py-2 text-gray-700">AI咨询</a>
+            <a href="{{ url_for('main.virtual_assistant') }}" class="block py-2 text-gray-700">虚拟人对话</a>
+            <a href="{{ url_for('main.consultation') }}" class="block py-2 text-gray-700">咨询服务</a>
+            <a href="{{ url_for('main.financial_analysis') }}" class="block py-2 text-gray-700">财务分析</a>
+            <a href="{{ url_for('main.portfolio_management') }}" class="block py-2 text-gray-700">投资管理</a>
+            <a href="{{ url_for('auth.logout') }}" class="block py-2 text-gray-700">退出登录</a>
+        </div>
+    </nav>
+
+    <!-- 控制面板内容 -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-elder-title text-gray-800 mb-8">欢迎回来，{{ current_user.name or '尊敬的用户' }}</h1>
+            
+            <!-- 服务卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <a href="{{ url_for('chat.chat_interface') }}" class="feature-card hover:border-primary hover:border-2">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">AI咨询</h3>
+                    <p class="text-elder text-gray-600">与AI金融顾问对话，获取专业的养老金融咨询和建议。</p>
+                </a>
+                <a href="{{ url_for('main.virtual_assistant') }}" class="feature-card hover:border-primary hover:border-2">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">虚拟人对话</h3>
+                    <p class="text-elder text-gray-600">与虚拟数字人进行更加自然的对话交流。</p>
+                </a>
+                <a href="{{ url_for('main.consultation') }}" class="feature-card hover:border-primary hover:border-2">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">咨询服务</h3>
+                    <p class="text-elder text-gray-600">获取产品推荐、常识科普和个性化建议。</p>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="{{ url_for('main.financial_analysis') }}" class="feature-card hover:border-primary hover:border-2">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">财务分析</h3>
+                    <p class="text-elder text-gray-600">通过专业的财务评估、趋势分析和风险分析，帮助您了解自己的财务状况和未来规划。</p>
+                </a>
+                <a href="{{ url_for('main.portfolio_management') }}" class="feature-card hover:border-primary hover:border-2">
+                    <div class="text-primary text-4xl mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-elder-title mb-4">投资管理</h3>
+                    <p class="text-elder text-gray-600">提供风险管理、投资组合调整和方案制定服务，确保您的资产得到合理配置和增值。</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
