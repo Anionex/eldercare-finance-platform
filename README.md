@@ -57,24 +57,29 @@ pip install -r requirements.txt
 npm install
 ```
 
-4. 配置环境变量
+4. 构建CSS文件
+```bash
+npm run build-css
+```
+
+5. 配置环境变量
 创建`.env`文件，添加以下内容：
 ```
 SECRET_KEY=your_secret_key
 OPENAI_API_KEY=your_openai_api_key
 ```
 
-5. 初始化数据库
+6. 初始化数据库
 ```bash
 python init_db.py
 ```
 
-6. 启动应用
+7. 启动应用
 ```bash
 python app.py
 ```
 
-7. 访问应用
+8. 访问应用
 浏览器打开 `http://localhost:5000`
 
 ## 部署指南
@@ -95,6 +100,9 @@ eldercare_finance_platform/
 │   ├── models.py               # 数据模型
 │   ├── static/                 # 静态资源
 │   │   ├── css/                # CSS样式
+│   │   │   ├── input.css       # TailwindCSS输入文件
+│   │   │   ├── output.css      # TailwindCSS生成的输出文件
+│   │   │   └── main.css        # 主要样式文件
 │   │   ├── js/                 # JavaScript脚本
 │   │   └── images/             # 图片资源
 │   └── templates/              # HTML模板
@@ -107,6 +115,37 @@ eldercare_finance_platform/
 ├── tailwind.config.js          # Tailwind配置
 └── postcss.config.js           # PostCSS配置
 ```
+
+## TailwindCSS配置说明
+
+本项目使用TailwindCSS进行样式管理。为确保样式正确加载，请注意以下几点：
+
+1. **正确的路径配置**：tailwind.config.js中的content路径必须指向正确的模板和JavaScript文件位置，即：
+```js
+content: [
+  "./eldercare_finance_platform/templates/**/*.html",
+  "./eldercare_finance_platform/static/**/*.js"
+]
+```
+
+2. **依赖版本**：确保使用兼容的依赖版本，特别是：
+```json
+"devDependencies": {
+  "autoprefixer": "^10.4.14",
+  "postcss": "^8.4.24",
+  "tailwindcss": "^3.3.2"
+}
+```
+
+3. **CSS构建流程**：项目需要构建TailwindCSS才能正确显示样式，使用以下命令：
+```bash
+npm run build-css
+```
+
+4. **CSS文件结构**：
+   - input.css：包含TailwindCSS指令
+   - output.css：由TailwindCSS生成的最终CSS文件
+   - main.css：项目自定义样式
 
 ## 使用说明
 
@@ -129,6 +168,52 @@ eldercare_finance_platform/
 - [ ] 虚拟人（多模态数字人）实现
 - [ ] 专业金融模型集成
 - [ ] 移动端适配优化
+
+## 常见问题解决
+
+### 样式不显示问题
+
+如果遇到样式不正确显示的问题，可能是由以下原因导致：
+
+1. **TailwindCSS配置路径错误**：检查tailwind.config.js中的content路径是否正确指向eldercare_finance_platform目录下的templates和static文件夹。
+
+2. **未构建CSS文件**：确保运行了`npm run build-css`命令生成output.css文件。
+
+3. **依赖版本问题**：确保使用正确版本的TailwindCSS（v3.x）和相关依赖。
+
+4. **CSS文件引用错误**：检查HTML模板中是否正确引用了output.css文件。
+
+### 解决方法
+
+1. 修改tailwind.config.js中的content路径：
+```js
+content: [
+  "./eldercare_finance_platform/templates/**/*.html",
+  "./eldercare_finance_platform/static/**/*.js"
+]
+```
+
+2. 更新package.json中的依赖版本：
+```json
+"devDependencies": {
+  "autoprefixer": "^10.4.14",
+  "postcss": "^8.4.24",
+  "tailwindcss": "^3.3.2"
+}
+```
+
+3. 添加CSS构建脚本到package.json：
+```json
+"scripts": {
+  "build-css": "npx tailwindcss -i ./eldercare_finance_platform/static/css/input.css -o ./eldercare_finance_platform/static/css/output.css --minify",
+  "watch-css": "npx tailwindcss -i ./eldercare_finance_platform/static/css/input.css -o ./eldercare_finance_platform/static/css/output.css --watch"
+}
+```
+
+4. 创建input.css文件并运行构建命令：
+```bash
+npm run build-css
+```
 
 ## 贡献指南
 

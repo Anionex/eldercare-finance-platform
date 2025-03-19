@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./templates/**/*.html",
-    "./static/**/*.js"
+    "./eldercare_finance_platform/templates/**/*.html",
+    "./eldercare_finance_platform/static/**/*.js"
   ],
   theme: {
     extend: {
